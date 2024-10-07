@@ -1,0 +1,82 @@
+# Compose Servicio de clinica
+services:
+
+
+  # Microservicio de página web ------------------------------------ 
+  microservicio-frontend:
+    image: nodered/node-red:latest
+    hostname: microservicio-frontend
+    container_name: microservicio-frontend
+    restart: always    
+    environment:
+      - TZ=America/Lima
+    ports:
+      - "1880:1880"      
+    volumes:
+      - /data/node-red:/data    
+    networks:
+      - micro-net    
+        # Ejecutar en host: sudo chown -R 1000:1000 /data/node-red
+
+
+  # Microservicio de pacientes --------------------------------------
+  microservicio-lab:
+    container_name: microservicio-lab
+    hostname: microservicio-lab
+    image: adrianss/apilab:tag
+    restart: always    
+    ports:
+      - "3000:3000"
+    networks:
+      - micro-net   
+    environment:
+      - MONGO_URI=mongodb://54.144.154.137:27017/midb
+
+
+  # Microservicio de citas ----------------------------------------
+  microservicio-citas:
+    image: leomontoya/microservicio-citas:latest
+    hostname: microservicio-citas
+    container_name: microservicio-citas
+    environment:
+      DB_HOST: 54.144.154.137
+      DB_PORT: 5432
+      DB_USERNAME: postgres
+      DB_PASSWORD: utec  
+    restart: always
+    ports:
+      - 8080:8080
+    networks:
+      - micro-net   
+
+
+  # Microservicio de pacientes -----------------------------------
+  microservicio-pacientes:
+    image: adrianss/ms_paciente-api:latest
+    container_name: microservicio-pacientes
+    hostname: microservicio-pacientes
+    restart: always  
+    ports:
+      - 8001:8000
+    environment:
+      DB_USER: user
+      DB_PASSWORD: user_password
+      DB_HOST: 54.144.154.137
+      DB_PORT: 3307
+      DB_NAME: ms_pacientes
+    networks:
+      - micro-net      
+
+
+ # Redes docker ------------------------------------------------
+networks:
+  micro-net:
+    driver: bridge
+
+
+# Volumenes de almacenamiento en host -------------------------
+volumes:
+  postgres_data:
+    external: true
+  node-red-data:
+    external: true   
