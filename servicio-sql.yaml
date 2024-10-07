@@ -1,0 +1,62 @@
+# Stack de las bases de datos
+services:
+
+  # Adminer ---------------------------------------------------
+  adminer-aws:
+    image: adminer
+    container_name: adminer-aws
+    restart: always
+    ports:
+      - 8083:8080
+    hostname: adminer-aws
+
+
+  # PostgreSQL ------------------------------------------------
+  postgres-aws:
+    image: postgres:latest
+    container_name: postgres-aws
+    environment:
+      POSTGRES_PASSWORD: utec
+      POSTGRES_USER: postgres
+    volumes:
+      - /data/postgres/postgres_data:/var/lib/postgresql/data
+      - /data/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+    restart: always
+    ports:
+      - 5432:5432
+    hostname: postgres-aws
+
+  
+  # Mongo DB --------------------------------------------------
+  mongodb-aws:
+    image: mongo:latest  
+    restart: always
+    hostname: mongodb-aws
+    container_name: mongodb-aws    
+
+    ports:
+      - 27017:27017    
+    volumes:   
+      - /data/mongo:/data/db
+
+  # MySQL  --------------------------------------------------
+  mysql-aws:
+    image: mysql:8.0
+    container_name: mysql-aws
+    hostname: mysql-aws
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_DATABASE: ms_pacientes
+      MYSQL_USER: user
+      MYSQL_PASSWORD: user_password
+    ports:
+      - "3306:3306"
+    volumes:
+      - /data/mysql:/var/lib/mysql
+      
+
+  # Volumes ---------------------------------------------------
+volumes:
+  postgres_data:
+    external: true
